@@ -1,47 +1,73 @@
 #include "sort.h"
 
 /**
- * get_max_gap - gets the a largest Knuth Sequence gap for this size
- * @size: the size of the array
- *
- * Return: the gap size
- */
-size_t get_max_gap(size_t size)
-{
-	size_t n;
+* swapem - Swaps tha nodes
+* @l: left or lower node
+* @r: right or later node
+* @h: Head of dlist
+*/
 
-	n = 1;
-	while (n < size)
-		n = n * 3 + 1;
-	return ((n - 1) / 3);
+void swapem(listint_t *l, listint_t *r, listint_t **h)
+{
+	listint_t *temp;
+
+	temp = l->prev;
+	if (temp)
+		temp->next = r;
+	r->prev = temp;
+	l->prev = r;
+	l->next = r->next;
+	r->next = l;
+	if (l->next != NULL)
+		l->next->prev = l;
+	if (r->prev == NULL)
+		*h = r;
+	print_list(*h);
 }
 
 /**
- * shell_sort - shell_sort
- * @array: the integer array to sort
- * @size: the size of the array
- *
- * Return: void
- */
-void shell_sort(int *array, size_t size)
+* cocktail_sort_list - sorts dlist using cocktail sort
+* @list: Head to dlist
+*/
+
+void cocktail_sort_list(listint_t **list)
 {
-	size_t gap, i, j;
-	int temp;
+	listint_t *temp;
+	int isS = 1;
+	int start = 0, end = 0, c;
 
-	if (!array || !size)
+	if (list == NULL)
 		return;
-
-
-	for (gap = get_max_gap(size); gap; gap = (gap - 1) / 3)
+	temp = *list;
+	while (temp->next != NULL)
+		temp = temp->next, end++;
+	temp = *list;
+	while (isS == 1)
 	{
-		for (i = gap; i < size; i++)
+		c = start;
+		while (c < end)
 		{
-			temp = array[i];
-			for (j = i; j > gap - 1 && array[j - gap] > temp; j -= gap)
+			if (temp->n > temp->next->n)
 			{
-				array[j] = array[j - gap];
+				swapem(temp, temp->next, list);
+				isS = 1;
 			}
-			array[j] = temp;
+			else
+				temp = temp->next;
+			c++;
 		}
-		print_array(array, size);
+		c = end, isS = 0;
+		while (c > start)
+		{
+			if (temp->n < temp->prev->n)
+			{
+				swapem(temp->prev, temp, list);
+				isS = 1;
+			}
+			else
+				temp = temp->prev;
+			c--;
+		}
+		start++;
 	}
+}
